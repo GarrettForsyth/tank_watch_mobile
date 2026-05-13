@@ -13,8 +13,7 @@ import com.garrettforsyth.tankwatch.viewmodel.hilt.MainViewModel
 fun MainScreen() {
     val viewModel: MainViewModel = hiltViewModel()
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-        Text(
-            "Hello from the main screen. x = ${viewModel.myValue}",
+        DashboardScreen(
             modifier = Modifier.padding(innerPadding)
         )
     }
