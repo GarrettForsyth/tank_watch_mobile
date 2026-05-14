@@ -4,7 +4,7 @@ import kotlin.time.Instant
 
 data class Reading(
     val time: Instant,
-    val measurementType: String,
+    val measurementType: MeasurementType,
     val value: Double,
     val macAddress: String,
     val sensorModel: String

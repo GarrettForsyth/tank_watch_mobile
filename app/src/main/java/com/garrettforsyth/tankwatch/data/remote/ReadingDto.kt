@@ -1,7 +1,7 @@
 package com.garrettforsyth.tankwatch.data.remote
 
+import com.garrettforsyth.tankwatch.data.model.MeasurementType
 import com.garrettforsyth.tankwatch.data.model.Reading
-import com.garrettforsyth.tankwatch.data.model.Sensor
 import kotlinx.serialization.Serializable
 import kotlin.time.Instant
 
@@ -16,7 +16,8 @@ data class ReadingDto(
 
 fun ReadingDto.toModel() = Reading(
     time = time,
-    measurementType = measurementType,
+    measurementType = MeasurementType.fromString(measurementType),
     value = value,
     macAddress = macAddress,
-    sensorModel = sensorModel )
+    sensorModel = sensorModel
+)

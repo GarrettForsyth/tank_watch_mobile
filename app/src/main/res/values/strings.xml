@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">TankWatch</string>
+    <string name="normal">Normal</string>
+    <string name="warning">Warning</string>
 </resources>
