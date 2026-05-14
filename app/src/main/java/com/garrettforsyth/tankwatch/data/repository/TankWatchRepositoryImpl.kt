@@ -23,11 +23,11 @@ class TankWatchRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getReadings(
+        deviceId: Int,
         sensorId: Int,
-        sensorRomAddress: String,
         range: String
     ): Resource<List<Reading>> = safeApiCall {
-        api.getReadings(sensorId, sensorRomAddress, range).map { it.toModel() }
+        api.getReadings(deviceId, sensorId, range).map { it.toModel() }
     }
 
     private suspend fun <T> safeApiCall(call: suspend () -> T): Resource<T> {

@@ -20,7 +20,7 @@ interface TankWatchApiService {
     @GET("api/readings")
     suspend fun getReadings(
         @Query("deviceId") deviceId: Int,
-        @Query("romAddress") romAddress: String,
+        @Query("sensorId") sensorId: Int,
         @Query("range") range: String = "24h"
     ): List<ReadingDto>
 }

@@ -28,8 +28,8 @@ class DashboardViewModel @Inject constructor(
         viewModelScope.launch {
             // TODO: Fetch devices and sensors for logged in user
             readings = tankWatchRepository.getReadings(
+                deviceId = 1,
                 sensorId = 1,
-                sensorRomAddress = "28FF70B85B64C87B"
             )
         }
     }

@@ -9,8 +9,8 @@ interface TankWatchRepository {
     suspend fun getDevices(): Resource<List<Device>>
     suspend fun getSensors(deviceId: Int): Resource<List<Sensor>>
     suspend fun getReadings(
+        deviceId: Int,
         sensorId: Int,
-        sensorRomAddress: String,
         range: String = "24h"
     ): Resource<List<Reading>>
 }
