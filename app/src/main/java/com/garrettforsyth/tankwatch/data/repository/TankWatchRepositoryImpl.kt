@@ -5,14 +5,20 @@ import com.garrettforsyth.tankwatch.data.model.Reading
 import com.garrettforsyth.tankwatch.data.model.Sensor
 import com.garrettforsyth.tankwatch.data.model.SensorConfig
 import com.garrettforsyth.tankwatch.data.remote.toModel
+import com.garrettforsyth.tankwatch.di.DispatcherModule
 import com.garrettforsyth.tankwatch.service.TankWatchApiService
 import com.garrettforsyth.tankwatch.util.Resource
 import jakarta.inject.Inject
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import okhttp3.Dispatcher
 import retrofit2.HttpException
 import java.io.IOException
 
 class TankWatchRepositoryImpl @Inject constructor(
-    private val api: TankWatchApiService
+    private val api: TankWatchApiService,
+    @param:DispatcherModule.IoDispatcher private val dispatcher: CoroutineDispatcher
 ) : TankWatchRepository {
 
     override suspend fun getDevices(): Resource<List<Device>> = safeApiCall {
@@ -35,8 +41,8 @@ class TankWatchRepositoryImpl @Inject constructor(
         api.getSensorConfig(sensorId).toModel()
     }
 
-    private suspend fun <T> safeApiCall(call: suspend () -> T): Resource<T> {
-        return try {
+    private suspend fun <T> safeApiCall(call: suspend () -> T): Resource<T> = withContext(dispatcher)  {
+        return@withContext try {
             Resource.Success(call())
         } catch (e: HttpException) {
             Resource.Error("Server error ${e.code()}: ${e.message()}")
