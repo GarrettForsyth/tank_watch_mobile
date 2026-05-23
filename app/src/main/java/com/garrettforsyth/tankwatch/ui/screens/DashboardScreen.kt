@@ -2,7 +2,6 @@ package com.garrettforsyth.tankwatch.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -14,18 +13,17 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.garrettforsyth.tankwatch.ui.cards.SensorCard
 import com.garrettforsyth.tankwatch.ui.theme.Dimensions
-import com.garrettforsyth.tankwatch.util.Resource
 import com.garrettforsyth.tankwatch.viewmodel.hilt.DashboardViewModel
 
 @Composable
 fun DashboardScreen(
     modifier: Modifier = Modifier,
-    viewModel: DashboardViewModel = hiltViewModel()
+    dashboardViewModel: DashboardViewModel,
+    toSensorDetailScreen: (Int) -> Unit
 ) {
-    val state = viewModel.uiState
+    val state = dashboardViewModel.uiState
 
     when {
         state.isLoading -> {
@@ -65,7 +63,7 @@ fun DashboardScreen(
                             sensor = sensorState.sensor,
                             readings = sensorState.readings,
                             config = sensorState.config,
-                            onClick = { /* TODO: navigate to SensorDetail */ }
+                            onClick = { toSensorDetailScreen(sensorState.sensor.id) }
                         )
                     }
                 }

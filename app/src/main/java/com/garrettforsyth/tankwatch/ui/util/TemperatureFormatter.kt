@@ -7,6 +7,7 @@ import androidx.core.os.LocaleListCompat
 import androidx.core.text.util.LocalePreferences
 import androidx.core.text.util.LocalePreferences.TemperatureUnit
 import java.util.Locale
+import kotlin.math.roundToInt
 
 /**
  * The server stores temperature in Celsius; Format it to the phone's locale
@@ -19,7 +20,8 @@ object TemperatureFormatter {
         } else {
             Pair(celsius, MeasureUnit.CELSIUS)
         } // Sorry Kelvin lovers
-        val measure = Measure(value, unit)
+        val roundedValue = (value * 10.0).roundToInt() / 10.0 // Round to 1 decimal place (should figure out a nicer way to do this)
+        val measure = Measure(roundedValue, unit)
         return android.icu.text.MeasureFormat
             .getInstance(locale, android.icu.text.MeasureFormat.FormatWidth.SHORT)
             .format(measure)

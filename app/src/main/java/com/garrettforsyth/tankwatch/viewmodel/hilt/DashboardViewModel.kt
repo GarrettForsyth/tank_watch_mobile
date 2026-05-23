@@ -10,7 +10,8 @@ import com.garrettforsyth.tankwatch.data.model.Reading
 import com.garrettforsyth.tankwatch.data.model.Sensor
 import com.garrettforsyth.tankwatch.data.model.SensorConfig
 import com.garrettforsyth.tankwatch.data.repository.TankWatchRepository
-import com.garrettforsyth.tankwatch.util.Resource
+import com.garrettforsyth.tankwatch.util.dataOrNull
+import com.garrettforsyth.tankwatch.util.errorOrNull
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.async
@@ -42,68 +43,66 @@ class DashboardViewModel @Inject constructor(
         viewModelScope.launch {
             uiState = DashboardUiState(isLoading = true)
 
-            when (val devices = tankWatchRepository.getDevices()) {
-                is Resource.Loading -> return@launch
-                is Resource.Error -> {
-                    uiState = DashboardUiState(isLoading = false, error = devices.message)
-                }
-                is Resource.Success ->{
-                    // Build all device states in parallel
-                    val deviceUiStates = devices.data.map { device ->
-                        async { buildDeviceUiState(device) }
-                    }.awaitAll()
+            val devicesResult = tankWatchRepository.getDevices()
 
-                    uiState = DashboardUiState(
-                        devices = deviceUiStates,
-                        isLoading = false
-                    )
-                }
+            val deviceUiStates = coroutineScope {
+                devicesResult.dataOrNull().orEmpty().map { device ->
+                    async { buildDeviceUiState(device) }
+                }.awaitAll()
             }
+
+            uiState = DashboardUiState(
+                devices = deviceUiStates,
+                error = devicesResult.errorOrNull(),
+                isLoading = false
+            )
         }
     }
 
-    private suspend fun buildDeviceUiState(device: Device): DeviceUiState {
-        val (sensors, error) = when (val result = tankWatchRepository.getSensors(device.id)) {
-            is Resource.Success -> result.data to null
-            is Resource.Error -> emptyList<Sensor>() to result.message
-            else -> emptyList<Sensor>() to null
-        }
+    private suspend fun buildDeviceUiState(device: Device): DashboardDeviceUiState {
+        val sensorsResult = tankWatchRepository.getSensors(device.id)
 
         val sensorUiStates = coroutineScope {
-            sensors.map { sensor ->
+            sensorsResult.dataOrNull().orEmpty().map { sensor ->
                 async {
-                    val (readings, readingsError) =
-                        when (val r = tankWatchRepository.getReadings(device.id, sensor.id)) {
-                            is Resource.Success -> r.data.sortedBy { it.time } to null
-                            is Resource.Error -> emptyList<Reading>() to r.message
-                            else -> emptyList<Reading>() to null
-                        }
-                    val (config, configError) = when (val r = tankWatchRepository.getSensorConfig(sensor.id)) {
-                        is Resource.Success -> r.data to null
-                        is Resource.Error -> null to r.message
-                        else -> null to null
-                    }
-                    SensorUiState(sensor, readings, config, readingsError, configError)
+                    val readingsDeferred = async { tankWatchRepository.getReadings(sensor.id) }
+                    val configDeferred = async { tankWatchRepository.getSensorConfig(sensor.id) }
+
+                    val readingsResult = readingsDeferred.await()
+                    val configResult = configDeferred.await()
+
+                    DashboardSensorUiState(
+                        sensor = sensor,
+                        readings = readingsResult.dataOrNull()?.sortedBy { it.time } ?: emptyList(),
+                        config = configResult.dataOrNull(),
+                        readingsError = readingsResult.errorOrNull(),
+                        configError = configResult.errorOrNull()
+                    )
                 }
             }.awaitAll()
         }
-        return DeviceUiState(device, sensorUiStates, error)
+
+        return DashboardDeviceUiState(
+            device = device,
+            sensors = sensorUiStates,
+            error = sensorsResult.errorOrNull()
+        )
     }
 }
 
 data class DashboardUiState(
-    val devices: List<DeviceUiState> = emptyList(),
+    val devices: List<DashboardDeviceUiState> = emptyList(),
     val isLoading: Boolean = true,
     val error: String? = null
 )
 
-data class DeviceUiState(
+data class DashboardDeviceUiState(
     val device: Device,
-    val sensors: List<SensorUiState>,
+    val sensors: List<DashboardSensorUiState>,
     val error: String? = null
 )
 
-data class SensorUiState(
+data class DashboardSensorUiState(
     val sensor: Sensor,
     val readings: List<Reading>,
     val config: SensorConfig?,

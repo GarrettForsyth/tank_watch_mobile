@@ -7,4 +7,6 @@ import kotlinx.serialization.Serializable
  */
 object Destinations {
     @Serializable object Main
+
+    @Serializable data class SensorDetail(val sensorId: Int)
 }

@@ -2,6 +2,7 @@ package com.garrettforsyth.tankwatch.data.repository
 
 import com.garrettforsyth.tankwatch.data.model.Device
 import com.garrettforsyth.tankwatch.data.model.Reading
+import com.garrettforsyth.tankwatch.data.model.ReadingRange
 import com.garrettforsyth.tankwatch.data.model.Sensor
 import com.garrettforsyth.tankwatch.data.model.SensorConfig
 import com.garrettforsyth.tankwatch.data.remote.toModel
@@ -10,9 +11,7 @@ import com.garrettforsyth.tankwatch.service.TankWatchApiService
 import com.garrettforsyth.tankwatch.util.Resource
 import jakarta.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import okhttp3.Dispatcher
 import retrofit2.HttpException
 import java.io.IOException
 
@@ -30,15 +29,18 @@ class TankWatchRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getReadings(
-        deviceId: Int,
         sensorId: Int,
-        range: String
+        range: ReadingRange
     ): Resource<List<Reading>> = safeApiCall {
-        api.getReadings(deviceId, sensorId, range).map { it.toModel() }
+        api.getReadings(sensorId, range.toString()).map { it.toModel() }
     }
 
     override suspend fun getSensorConfig(sensorId: Int): Resource<SensorConfig> = safeApiCall {
         api.getSensorConfig(sensorId).toModel()
+    }
+
+    override suspend fun getSensor(sensorId: Int): Resource<Sensor> = safeApiCall {
+        api.getSensor(sensorId).toModel()
     }
 
     private suspend fun <T> safeApiCall(call: suspend () -> T): Resource<T> = withContext(dispatcher)  {

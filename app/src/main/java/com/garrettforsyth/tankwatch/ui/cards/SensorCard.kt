@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -25,14 +24,13 @@ import com.garrettforsyth.tankwatch.data.model.MeasurementType
 import com.garrettforsyth.tankwatch.data.model.Reading
 import com.garrettforsyth.tankwatch.data.model.Sensor
 import com.garrettforsyth.tankwatch.data.model.SensorConfig
+import com.garrettforsyth.tankwatch.ui.components.SensorStatusBadge
+import com.garrettforsyth.tankwatch.ui.components.deriveSensorStatus
 import com.garrettforsyth.tankwatch.ui.theme.Dimensions
 import com.garrettforsyth.tankwatch.ui.theme.TankWatchTheme
 import com.garrettforsyth.tankwatch.ui.util.PreviewData
 import com.garrettforsyth.tankwatch.ui.util.ValueFormatter
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
-import com.patrykandpatrick.vico.compose.cartesian.axis.Axis
-import com.patrykandpatrick.vico.compose.cartesian.axis.HorizontalAxis
-import com.patrykandpatrick.vico.compose.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.compose.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.compose.cartesian.data.CartesianLayerRangeProvider
 import com.patrykandpatrick.vico.compose.cartesian.data.lineSeries
@@ -52,7 +50,7 @@ fun SensorCard(
 ) {
     val currentValue = readings.lastOrNull()?.value
     val measurementType = readings.lastOrNull()?.measurementType ?: MeasurementType.Unknown
-    val status = deriveStatus(currentValue, config)
+    val status = deriveSensorStatus(currentValue, config)
 
     Card(
         onClick = onClick,
@@ -72,7 +70,7 @@ fun SensorCard(
                     style = MaterialTheme.typography.titleMedium
                 )
                 if (status != null) {
-                    StatusBadge(status)
+                    SensorStatusBadge(status)
                 }
             }
 
@@ -95,38 +93,16 @@ fun SensorCard(
 }
 
 @Composable
-private fun StatusBadge(status: SensorStatus) {
-    val (label, color) = when (status) {
-        SensorStatus.Normal  -> stringResource(R.string.normal) to MaterialTheme.colorScheme.tertiary
-        SensorStatus.Warning -> stringResource(R.string.warning) to MaterialTheme.colorScheme.error
-    }
-    Surface(
-        shape = MaterialTheme.shapes.small,
-        color = color.copy(alpha = 0.15f),
-        contentColor = color
-    ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelSmall,
-            modifier = Modifier.padding(
-                horizontal = Dimensions.Padding.small,
-                vertical = Dimensions.Padding.xSmall
-            )
-        )
-    }
-}
-
-@Composable
 private fun Sparkline(readings: List<Reading>) {
     if (readings.isEmpty()) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(60.dp),
+                .height(Dimensions.Spacer.xLarge),
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "No data",
+                text = stringResource(R.string.no_data),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -167,18 +143,6 @@ private fun Sparkline(readings: List<Reading>) {
         scrollState = rememberVicoScrollState(scrollEnabled = false),
         zoomState = rememberVicoZoomState(zoomEnabled = false),
     )
-}
-
-// --- Status helpers ---
-
-enum class SensorStatus { Normal, Warning }
-
-private fun deriveStatus(value: Double?, config: SensorConfig?): SensorStatus? {
-    if (value == null || config == null) return null
-    return when {
-        value < config.minValue || value > config.maxValue -> SensorStatus.Warning
-        else -> SensorStatus.Normal
-    }
 }
 
 // --- Previews ---

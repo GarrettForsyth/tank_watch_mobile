@@ -6,7 +6,7 @@ object ValueFormatter {
     fun format(value: Double, measurementType: MeasurementType): String {
         return when (measurementType) {
             MeasurementType.Temperature -> TemperatureFormatter.format(value)
-            else -> value.toString()
+            else -> "%.1f".format(value)
         }
     }
 }

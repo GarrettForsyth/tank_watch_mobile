@@ -1,9 +1,15 @@
 package com.garrettforsyth.tankwatch.ui.util
 
+import com.garrettforsyth.tankwatch.data.model.Device
 import com.garrettforsyth.tankwatch.data.model.MeasurementType
 import com.garrettforsyth.tankwatch.data.model.Reading
 import com.garrettforsyth.tankwatch.data.model.Sensor
 import com.garrettforsyth.tankwatch.data.model.SensorConfig
+import com.garrettforsyth.tankwatch.ui.model.StatData
+import com.garrettforsyth.tankwatch.ui.model.StatType
+import com.garrettforsyth.tankwatch.viewmodel.hilt.SensorDetailUiState
+import kotlin.Int
+import kotlin.collections.List
 import kotlin.random.Random
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.hours
@@ -12,12 +18,27 @@ import kotlin.time.Duration.Companion.seconds
 
 object PreviewData {
 
+    val device = Device(
+        id = 1,
+        tankId = 1,
+        name = "Monitor #1",
+        macAddress = "6825DDF0A9C0"
+    )
+
     val sensor = Sensor(
         id = 1,
         deviceId = 1,
         model = "DS18B20",
         romAddress = "28FF70B85B64C87B",
-        displayName = "Water Temperature"
+        displayName = "Water Temperature",
+        deviceName = PreviewData.device.name,
+        tankName = "35G Tall" // TODO: Create tank preview
+    )
+
+    val statsData = listOf(
+        StatData("22 C", StatType.Min),
+        StatData("25 C", StatType.Average),
+        StatData("28 C", StatType.Max),
     )
 
     val sensorConfig = SensorConfig(
@@ -47,4 +68,13 @@ object PreviewData {
     }
 
     val readingsEmpty = emptyList<Reading>()
+
+    val sensorDetailUiState = SensorDetailUiState(
+        sensor = PreviewData.sensor,
+        readings = PreviewData.readings,
+        stats = PreviewData.statsData,
+        config = PreviewData.sensorConfig,
+        error = null,
+        isLoading = false
+    )
 }

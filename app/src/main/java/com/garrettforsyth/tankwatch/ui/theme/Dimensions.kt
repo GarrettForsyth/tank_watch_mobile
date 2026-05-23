@@ -9,6 +9,7 @@ object Dimensions {
         val medium= 16.dp
         val large = 24.dp
         val xLarge = 32.dp
+        val page = 16.dp
     }
 
     object Spacer {
@@ -26,5 +27,11 @@ object Dimensions {
         val heavy = 0.38f
         val disabled = 0.38f  // Material3 standard for disabled state
         val opaque = 1f
+    }
+
+    object Icon {
+        val small = 16.dp
+        val medium = 24.dp
+        val large = 32.dp
     }
 }

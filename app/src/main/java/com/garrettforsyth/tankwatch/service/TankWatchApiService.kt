@@ -1,5 +1,6 @@
 package com.garrettforsyth.tankwatch.service
 
+import com.garrettforsyth.tankwatch.data.model.ReadingRange
 import com.garrettforsyth.tankwatch.data.remote.DeviceDto
 import com.garrettforsyth.tankwatch.data.remote.ReadingDto
 import com.garrettforsyth.tankwatch.data.remote.SensorConfigDto
@@ -20,13 +21,17 @@ interface TankWatchApiService {
 
     @GET("api/readings")
     suspend fun getReadings(
-        @Query("deviceId") deviceId: Int,
         @Query("sensorId") sensorId: Int,
-        @Query("range") range: String = "1h"
+        @Query("range") range: String = ReadingRange.ONE_HOUR.toString()
     ): List<ReadingDto>
 
     @GET("api/sensors/{sensorId}/config")
     suspend fun getSensorConfig(
         @Path("sensorId") sensorId: Int
     ): SensorConfigDto
+
+    @GET("api/sensors/{sensorId}")
+    suspend fun getSensor(
+        @Path("sensorId") sensorId: Int
+    ): SensorDto
 }

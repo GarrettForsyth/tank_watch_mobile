@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 data class DeviceDto(
     val id: Int,
     val tankId: Int,
-    val name: String,
+    val name: String?,
     val macAddress: String
 )
 

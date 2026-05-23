@@ -2,4 +2,15 @@
     <string name="app_name">TankWatch</string>
     <string name="normal">Normal</string>
     <string name="warning">Warning</string>
+    <string name="back">Back</string>
+    <string name="updated_s_ago">Updated %1$ds ago.</string>
+    <string name="updated_m_ago">Updated %1$dm ago.</string>
+    <string name="updated_h_ago">Updated %1$dh ago.</string>
+    <string name="min">Min</string>
+    <string name="max">Max</string>
+    <string name="average">Average</string>
+    <string name="no_data">No data</string>
+    <string name="no_readings">No readings</string>
+    <string name="warning_threshold">Warning Threshold: %1$s - %2$s</string>
+    <string name="notification">Notification</string>
 </resources>
