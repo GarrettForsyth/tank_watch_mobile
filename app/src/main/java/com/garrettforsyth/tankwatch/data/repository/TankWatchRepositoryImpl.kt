@@ -5,6 +5,7 @@ import com.garrettforsyth.tankwatch.data.model.Reading
 import com.garrettforsyth.tankwatch.data.model.ReadingRange
 import com.garrettforsyth.tankwatch.data.model.Sensor
 import com.garrettforsyth.tankwatch.data.model.SensorConfig
+import com.garrettforsyth.tankwatch.data.remote.FcmTokenDto
 import com.garrettforsyth.tankwatch.data.remote.toModel
 import com.garrettforsyth.tankwatch.di.DispatcherModule
 import com.garrettforsyth.tankwatch.service.TankWatchApiService
@@ -41,6 +42,10 @@ class TankWatchRepositoryImpl @Inject constructor(
 
     override suspend fun getSensor(sensorId: Int): Resource<Sensor> = safeApiCall {
         api.getSensor(sensorId).toModel()
+    }
+
+    override suspend fun registerFcmToken(token: String): Resource<Unit> = safeApiCall {
+        api.registerFcmToken(FcmTokenDto(token))
     }
 
     private suspend fun <T> safeApiCall(call: suspend () -> T): Resource<T> = withContext(dispatcher)  {

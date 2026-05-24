@@ -13,4 +13,13 @@
     <string name="no_readings">No readings</string>
     <string name="warning_threshold">Warning Threshold: %1$s - %2$s</string>
     <string name="notification">Notification</string>
+    <string name="notification_channel_tank_alerts_name">Tank Alerts</string>
+    <string name="notification_channel_tank_alerts_description">Alerts when sensor readings breach configured thresholds.</string>
+    <string name="notification_tank_alert_title">Tank Alert — %1$s</string>
+    <string name="above_max">above max</string>
+    <string name="below_min">below min</string>
+    <string name="outside">outside</string>
+    <string name="notification_tank_alert_message">%1$s is %2$s threshold. Currently %3$s.</string>
+    <string name="unknown_tank">Unknown Tank</string>
+    <string name="sensor">Sensor</string>
 </resources>

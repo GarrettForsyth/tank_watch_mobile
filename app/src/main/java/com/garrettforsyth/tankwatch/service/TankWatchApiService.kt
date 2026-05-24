@@ -2,10 +2,14 @@ package com.garrettforsyth.tankwatch.service
 
 import com.garrettforsyth.tankwatch.data.model.ReadingRange
 import com.garrettforsyth.tankwatch.data.remote.DeviceDto
+import com.garrettforsyth.tankwatch.data.remote.FcmTokenDto
 import com.garrettforsyth.tankwatch.data.remote.ReadingDto
 import com.garrettforsyth.tankwatch.data.remote.SensorConfigDto
 import com.garrettforsyth.tankwatch.data.remote.SensorDto
+import retrofit2.Response
+import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -34,4 +38,7 @@ interface TankWatchApiService {
     suspend fun getSensor(
         @Path("sensorId") sensorId: Int
     ): SensorDto
+
+    @PUT("api/notifications/token")
+    suspend fun registerFcmToken(@Body token: FcmTokenDto): Response<Unit>
 }
