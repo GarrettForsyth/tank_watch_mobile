@@ -30,10 +30,10 @@ class TankWatchRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getReadings(
-        sensorId: Int,
+        romAddress: String,
         range: ReadingRange
     ): Resource<List<Reading>> = safeApiCall {
-        api.getReadings(sensorId, range.toString()).map { it.toModel() }
+        api.getReadings(romAddress, range.toString()).map { it.toModel() }
     }
 
     override suspend fun getSensorConfig(sensorId: Int): Resource<SensorConfig> = safeApiCall {

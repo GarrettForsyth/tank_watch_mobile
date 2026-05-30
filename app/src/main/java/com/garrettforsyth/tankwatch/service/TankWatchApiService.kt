@@ -25,7 +25,7 @@ interface TankWatchApiService {
 
     @GET("api/readings")
     suspend fun getReadings(
-        @Query("sensorId") sensorId: Int,
+        @Query("romAddress") romAddress: String,
         @Query("range") range: String = ReadingRange.ONE_HOUR.toString()
     ): List<ReadingDto>
 

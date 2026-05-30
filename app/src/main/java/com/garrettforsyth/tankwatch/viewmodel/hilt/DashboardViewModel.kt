@@ -65,7 +65,7 @@ class DashboardViewModel @Inject constructor(
         val sensorUiStates = coroutineScope {
             sensorsResult.dataOrNull().orEmpty().map { sensor ->
                 async {
-                    val readingsDeferred = async { tankWatchRepository.getReadings(sensor.id) }
+                    val readingsDeferred = async { tankWatchRepository.getReadings(sensor.romAddress) }
                     val configDeferred = async { tankWatchRepository.getSensorConfig(sensor.id) }
 
                     val readingsResult = readingsDeferred.await()

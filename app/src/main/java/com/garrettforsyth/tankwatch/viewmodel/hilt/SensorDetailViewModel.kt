@@ -17,6 +17,7 @@ import com.garrettforsyth.tankwatch.navigation.Destinations
 import com.garrettforsyth.tankwatch.ui.model.StatData
 import com.garrettforsyth.tankwatch.ui.model.StatType
 import com.garrettforsyth.tankwatch.ui.util.ValueFormatter
+import com.garrettforsyth.tankwatch.util.Resource
 import com.garrettforsyth.tankwatch.util.dataOrNull
 import com.garrettforsyth.tankwatch.util.errorOrNull
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -52,22 +53,28 @@ class SensorDetailViewModel @Inject constructor(
     private fun loadSensorDetails(readingRange: ReadingRange = ReadingRange.ONE_DAY) {
         uiState = SensorDetailUiState(isLoading = true)
 
-        // Fetch the sensor, readings, and config all at the same time
         viewModelScope.launch {
             coroutineScope {
+                // Sensor and config can run in parallel — both only need sensorId
                 val sensorDeferred = async { tankWatchRepository.getSensor(sensorId) }
-                val readingsDeferred = async { tankWatchRepository.getReadings(sensorId, readingRange) }
                 val configDeferred = async { tankWatchRepository.getSensorConfig(sensorId) }
 
                 val sensorResult = sensorDeferred.await()
-                val readingsResult = readingsDeferred.await()
                 val configResult = configDeferred.await()
-                val statsData = calculateStatsData(readingsResult.dataOrNull() ?: emptyList())
-                val error = sensorResult.errorOrNull() ?: readingsResult.errorOrNull() ?: configResult.errorOrNull()
+
+                // Readings must wait for romAddress from sensor result
+                val readingsResult = (sensorResult as? Resource.Success<Sensor>)?.let {
+                    tankWatchRepository.getReadings(it.data.romAddress, readingRange)
+                }
+
+                val statsData = calculateStatsData(readingsResult?.dataOrNull() ?: emptyList())
+                val error = sensorResult.errorOrNull()
+                    ?: readingsResult?.errorOrNull()
+                    ?: configResult.errorOrNull()
 
                 uiState = SensorDetailUiState(
                     sensor = sensorResult.dataOrNull(),
-                    readings = readingsResult.dataOrNull()?.sortedBy { it.time } ?: emptyList(),
+                    readings = readingsResult?.dataOrNull()?.sortedBy { it.time } ?: emptyList(),
                     stats = statsData,
                     config = configResult.dataOrNull(),
                     readingRange = readingRange,
