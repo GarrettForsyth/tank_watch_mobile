@@ -7,7 +7,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import com.garrettforsyth.tankwatch.data.model.MeasurementType
 
 object Icons {
-    fun MeasurementTypeIcon(measurementType: MeasurementType): ImageVector = when (measurementType) {
+    fun measurementTypeIcon(measurementType: MeasurementType): ImageVector = when (measurementType) {
         MeasurementType.Temperature -> Icons.Outlined.Thermostat
         MeasurementType.Unknown -> Icons.Outlined.DeviceUnknown
     }

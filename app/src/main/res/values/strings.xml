@@ -24,4 +24,11 @@
     <string name="sensor">Sensor</string>
     <string name="no_sensors">No Sensors</string>
     <string name="unknown_sensor_type">Unknown sensor type</string>
+    <string name="x_axis_time">Time</string>
+    <string name="range_one_hour">hour</string>
+    <string name="range_six_hours">6 hours</string>
+    <string name="range_one_day">24 hours</string>
+    <string name="range_one_week">7 days</string>
+    <string name="range_one_month">30 days</string>
+    <string name="readings_in_last">Readings in last %s</string>
 </resources>

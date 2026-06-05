@@ -1,7 +1,6 @@
 package com.garrettforsyth.tankwatch.ui.cards.sensor
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -22,10 +21,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.garrettforsyth.tankwatch.R
 import com.garrettforsyth.tankwatch.data.model.MeasurementType
 import com.garrettforsyth.tankwatch.data.model.Reading
 import com.garrettforsyth.tankwatch.data.model.Sensor
@@ -37,7 +34,6 @@ import com.garrettforsyth.tankwatch.ui.theme.Icons
 import com.garrettforsyth.tankwatch.ui.theme.TankWatchTheme
 import com.garrettforsyth.tankwatch.ui.theme.TemperatureColor
 import com.garrettforsyth.tankwatch.ui.theme.temperatureCold
-import com.garrettforsyth.tankwatch.ui.theme.temperatureNeutral
 import com.garrettforsyth.tankwatch.ui.theme.temperatureWarm
 import com.garrettforsyth.tankwatch.ui.util.PreviewData
 import com.garrettforsyth.tankwatch.ui.util.ValueFormatter
@@ -91,7 +87,7 @@ fun TemperatureSensorCard(
                 horizontalArrangement = Arrangement.spacedBy(Dimensions.Spacer.small)
             ) {
                 Icon(
-                    imageVector = Icons.MeasurementTypeIcon(MeasurementType.Temperature),
+                    imageVector = Icons.measurementTypeIcon(MeasurementType.Temperature),
                     contentDescription = null,
                     modifier = Modifier.size(Dimensions.Icon.small),
                     tint = valueColor
@@ -101,6 +97,11 @@ fun TemperatureSensorCard(
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.weight(1f)
+                )
+                Text(
+                    text = ValueFormatter.format(lastReading.value, lastReading.measurementType),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = valueColor
                 )
                 if (status != null) {
                     Spacer(modifier = Modifier.width(Dimensions.Spacer.xSmall))
