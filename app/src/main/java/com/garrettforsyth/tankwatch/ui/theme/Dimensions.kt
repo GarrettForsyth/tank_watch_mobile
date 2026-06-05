@@ -3,6 +3,9 @@ package com.garrettforsyth.tankwatch.ui.theme
 import androidx.compose.ui.unit.dp
 
 object Dimensions {
+
+    val sparkLineHeight = 48.dp
+
     object Padding {
         val xSmall = 4.dp
         val small = 8.dp

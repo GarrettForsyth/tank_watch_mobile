@@ -22,4 +22,6 @@
     <string name="notification_tank_alert_message">%1$s is %2$s threshold. Currently %3$s.</string>
     <string name="unknown_tank">Unknown Tank</string>
     <string name="sensor">Sensor</string>
+    <string name="no_sensors">No Sensors</string>
+    <string name="unknown_sensor_type">Unknown sensor type</string>
 </resources>

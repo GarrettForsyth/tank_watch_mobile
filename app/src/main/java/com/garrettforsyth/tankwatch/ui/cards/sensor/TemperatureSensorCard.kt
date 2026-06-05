@@ -1,4 +1,4 @@
-package com.garrettforsyth.tankwatch.ui.cards
+package com.garrettforsyth.tankwatch.ui.cards.sensor
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -8,7 +8,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -16,6 +20,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -27,89 +33,98 @@ import com.garrettforsyth.tankwatch.data.model.SensorConfig
 import com.garrettforsyth.tankwatch.ui.components.SensorStatusBadge
 import com.garrettforsyth.tankwatch.ui.components.deriveSensorStatus
 import com.garrettforsyth.tankwatch.ui.theme.Dimensions
+import com.garrettforsyth.tankwatch.ui.theme.Icons
 import com.garrettforsyth.tankwatch.ui.theme.TankWatchTheme
+import com.garrettforsyth.tankwatch.ui.theme.TemperatureColor
+import com.garrettforsyth.tankwatch.ui.theme.temperatureCold
+import com.garrettforsyth.tankwatch.ui.theme.temperatureNeutral
+import com.garrettforsyth.tankwatch.ui.theme.temperatureWarm
 import com.garrettforsyth.tankwatch.ui.util.PreviewData
 import com.garrettforsyth.tankwatch.ui.util.ValueFormatter
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
 import com.patrykandpatrick.vico.compose.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.compose.cartesian.data.CartesianLayerRangeProvider
 import com.patrykandpatrick.vico.compose.cartesian.data.lineSeries
+import com.patrykandpatrick.vico.compose.cartesian.decoration.HorizontalLine
+import com.patrykandpatrick.vico.compose.cartesian.layer.LineCartesianLayer
+import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLine
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
 import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
 import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
 import com.patrykandpatrick.vico.compose.cartesian.rememberVicoZoomState
+import com.patrykandpatrick.vico.compose.common.Fill
+import com.patrykandpatrick.vico.compose.common.component.LineComponent
 import com.patrykandpatrick.vico.compose.common.data.ExtraStore
+import kotlin.collections.buildList
 
 @Composable
-fun SensorCard(
+fun TemperatureSensorCard(
     sensor: Sensor,
     readings: List<Reading>,
     config: SensorConfig?,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val currentValue = readings.lastOrNull()?.value
-    val measurementType = readings.lastOrNull()?.measurementType ?: MeasurementType.Unknown
-    val status = deriveSensorStatus(currentValue, config)
+    val lastReading = readings.last()  // Should always exist (see SensorCard)
+    val status = deriveSensorStatus(lastReading.value, config)
+    val valueColor = config?.let { TemperatureColor.forValue(
+        celsius = lastReading.value.toFloat(),
+        coldTemp = config.minValue.toFloat(),
+        neutralTemp = ((config.minValue + config.maxValue) / 2.0).toFloat(),
+        warmTemp = config.maxValue.toFloat()
+    ) } ?: MaterialTheme.colorScheme.primary
 
     Card(
         onClick = onClick,
         modifier = modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.large
+        shape = MaterialTheme.shapes.large,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+        )
     ) {
         Column(modifier = Modifier.padding(Dimensions.Padding.medium)) {
 
-            // Name and Status Badge
+            // Single header row: icon + name + reading + badge
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(Dimensions.Spacer.small)
             ) {
+                Icon(
+                    imageVector = Icons.MeasurementTypeIcon(MeasurementType.Temperature),
+                    contentDescription = null,
+                    modifier = Modifier.size(Dimensions.Icon.small),
+                    tint = valueColor
+                )
                 Text(
                     text = sensor.displayName ?: sensor.model,
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.weight(1f)
                 )
                 if (status != null) {
+                    Spacer(modifier = Modifier.width(Dimensions.Spacer.xSmall))
                     SensorStatusBadge(status)
                 }
             }
 
             Spacer(modifier = Modifier.height(Dimensions.Spacer.small))
 
-            // Sensor Reading
-            Text(
-                text = if (currentValue != null)
-                    ValueFormatter.format(currentValue, measurementType)
-                else "—",
-                style = MaterialTheme.typography.displaySmall,
-                color = MaterialTheme.colorScheme.primary
+            Sparkline(
+                readings = readings,
+                config = config,
+                lineColor = valueColor
             )
-
-            Spacer(modifier = Modifier.height(Dimensions.Spacer.medium))
-
-            Sparkline(readings = readings)
         }
     }
 }
 
 @Composable
-private fun Sparkline(readings: List<Reading>) {
-    if (readings.isEmpty()) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(Dimensions.Spacer.xLarge),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = stringResource(R.string.no_data),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-        return
-    }
-
+private fun Sparkline(
+    readings: List<Reading>,
+    config: SensorConfig?,
+    lineColor: Color
+) {
     val modelProducer = remember { CartesianChartModelProducer() }
 
     LaunchedEffect(readings) {
@@ -123,23 +138,64 @@ private fun Sparkline(readings: List<Reading>) {
         }
     }
 
+    val decorations = remember(config) {
+        buildList {
+            config?.let { config ->
+                add(
+                    HorizontalLine(
+                        y = { config.minValue },
+                        line = LineComponent(
+                            fill = Fill(temperatureCold),
+                            thickness = 1.dp
+                        )
+                    )
+                )
+                add(HorizontalLine(
+                    y = { config.maxValue },
+                    line = LineComponent(
+                        fill = Fill(temperatureWarm),
+                        thickness = 1.dp
+                    )
+                ))
+            }
+        }
+    }
+
     CartesianChartHost(
         chart = rememberCartesianChart(
             rememberLineCartesianLayer(
-                // Zoom in on the relevant areas
+                lineProvider = LineCartesianLayer.LineProvider.series(
+                    LineCartesianLayer.rememberLine(
+                        fill = LineCartesianLayer.LineFill.single(Fill(lineColor)),
+                        areaFill = LineCartesianLayer.AreaFill.single(
+                            Fill(
+                                Brush.verticalGradient(
+                                    colors = listOf(
+                                        lineColor.copy(alpha = Dimensions.Opacity.heavy),
+                                        lineColor.copy(alpha = Dimensions.Opacity.none)
+                                    )
+                                )
+                            )
+                        )
+                    )
+                ),
                 rangeProvider = object : CartesianLayerRangeProvider {
                     override fun getMinY(minY: Double, maxY: Double, extraStore: ExtraStore): Double {
-                        return minY - 0.5
+                        val threshold = config?.minValue ?: minY
+                        return minOf(minY, threshold) - 0.5
                     }
                     override fun getMaxY(minY: Double, maxY: Double, extraStore: ExtraStore): Double {
-                        return maxY + 0.5
+                        val threshold = config?.maxValue ?: maxY
+                        return maxOf(maxY, threshold) + 0.5
                     }
-                }),
+                }
+            ),
+            decorations = decorations
         ),
         modelProducer = modelProducer,
         modifier = Modifier
             .fillMaxWidth()
-            .height(60.dp),
+            .height(Dimensions.sparkLineHeight),
         scrollState = rememberVicoScrollState(scrollEnabled = false),
         zoomState = rememberVicoZoomState(zoomEnabled = false),
     )

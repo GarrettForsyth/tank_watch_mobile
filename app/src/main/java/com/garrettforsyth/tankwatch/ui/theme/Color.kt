@@ -1,6 +1,7 @@
 package com.garrettforsyth.tankwatch.ui.theme
 
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 
 val primaryLight = Color(0xFF0C6B59)
 val onPrimaryLight = Color(0xFFFFFFFF)
@@ -217,3 +218,31 @@ val surfaceContainerLowDarkHighContrast = Color(0xFF1B211F)
 val surfaceContainerDarkHighContrast = Color(0xFF2B322F)
 val surfaceContainerHighDarkHighContrast = Color(0xFF363D3A)
 val surfaceContainerHighestDarkHighContrast = Color(0xFF424846)
+val temperatureCold = Color(0xFF6BB5D6)
+val temperatureNeutral = Color(0xFF85D6BF)
+val temperatureWarm = Color(0xFFE07B4A)
+
+// Colours to use to reflect a temperature gradient
+object TemperatureColor {
+    fun forValue(
+        celsius: Float,
+        coldTemp: Float,
+        neutralTemp: Float,
+        warmTemp: Float
+    ): Color {
+        return when {
+            celsius < coldTemp -> temperatureCold
+            celsius > warmTemp -> temperatureWarm
+            celsius < neutralTemp -> lerp(
+                temperatureCold,
+                temperatureNeutral,
+                (celsius - coldTemp) / (neutralTemp - coldTemp)
+            )
+            else -> lerp(
+                temperatureNeutral,
+                temperatureWarm,
+                (celsius - neutralTemp) / (warmTemp - neutralTemp)
+            )
+        }
+    }
+}
