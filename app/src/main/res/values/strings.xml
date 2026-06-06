@@ -33,4 +33,5 @@
     <string name="readings_in_last">Readings in last %s</string>
     <string name="warn_above">Warn above</string>
     <string name="warn_below">Warn below</string>
+    <string name="tank_watch">Tank Watch</string>
 </resources>
