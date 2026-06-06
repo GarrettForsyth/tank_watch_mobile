@@ -32,6 +32,10 @@ class DashboardViewModel @Inject constructor(
         loadDashboard()
     }
 
+    fun refresh() {
+        loadDashboard(isRefreshing = true)
+    }
+
     /**
      * Here we:
      * 1) Request the server for all the user's devices
@@ -39,9 +43,13 @@ class DashboardViewModel @Inject constructor(
      * 3.1) For each device sensor, request for its configuration
      * 3.2) For each device sensor, request for its readings
      */
-    private fun loadDashboard() {
+    private fun loadDashboard(isRefreshing: Boolean = false) {
         viewModelScope.launch {
-            uiState = DashboardUiState(isLoading = true)
+            uiState = if (isRefreshing) {
+                uiState.copy(isRefreshing = true)
+            } else {
+                DashboardUiState(isLoading = true)
+            }
 
             val devicesResult = tankWatchRepository.getDevices()
 
@@ -51,10 +59,11 @@ class DashboardViewModel @Inject constructor(
                 }.awaitAll()
             }
 
-            uiState = DashboardUiState(
+            uiState = uiState.copy(
                 devices = deviceUiStates,
                 error = devicesResult.errorOrNull(),
-                isLoading = false
+                isLoading = false,
+                isRefreshing = false
             )
         }
     }
@@ -93,6 +102,7 @@ class DashboardViewModel @Inject constructor(
 data class DashboardUiState(
     val devices: List<DashboardDeviceUiState> = emptyList(),
     val isLoading: Boolean = true,
+    val isRefreshing: Boolean = false,
     val error: String? = null
 )
 
