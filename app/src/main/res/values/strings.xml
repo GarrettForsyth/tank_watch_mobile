@@ -31,4 +31,6 @@
     <string name="range_one_week">7 days</string>
     <string name="range_one_month">30 days</string>
     <string name="readings_in_last">Readings in last %s</string>
+    <string name="warn_above">Warn above</string>
+    <string name="warn_below">Warn below</string>
 </resources>

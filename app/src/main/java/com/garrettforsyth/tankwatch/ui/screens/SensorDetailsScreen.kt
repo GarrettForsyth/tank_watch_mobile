@@ -24,7 +24,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -33,20 +32,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.garrettforsyth.tankwatch.R
-import com.garrettforsyth.tankwatch.data.model.MeasurementType
 import com.garrettforsyth.tankwatch.data.model.Reading
 import com.garrettforsyth.tankwatch.data.model.ReadingRange
 import com.garrettforsyth.tankwatch.data.model.SensorConfig
 import com.garrettforsyth.tankwatch.ui.cards.StatCard
 import com.garrettforsyth.tankwatch.ui.components.SensorStatus
-import com.garrettforsyth.tankwatch.ui.components.SensorStatusBadge
 import com.garrettforsyth.tankwatch.ui.components.deriveSensorStatus
 import com.garrettforsyth.tankwatch.ui.model.StatData
 import com.garrettforsyth.tankwatch.ui.theme.Dimensions
@@ -173,7 +170,18 @@ fun SensorDetailScreenContent(
         item {
             currentReading?.let {
                 SensorReadingBar(it, state.config)
-            } ?: Text(stringResource(R.string.no_readings))
+            } ?:
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(Padding.large),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Text(stringResource(R.string.no_readings))
+                }
+        }
+        item {
+            StatsSummary(state.stats)
         }
         item {
             ReadingsChart(
@@ -187,9 +195,6 @@ fun SensorDetailScreenContent(
                 readingRange = state.readingRange,
                 onRangeFilterChange = onRangeFilterChange
             )
-        }
-        item {
-            StatsSummary(state.stats)
         }
     }
 }
@@ -230,7 +235,6 @@ private fun SensorReadingBar(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Left: icon + reading + updated-at
             Column {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -256,19 +260,18 @@ private fun SensorReadingBar(
                 )
             }
 
-            // Right: threshold values
             sensorConfig?.let { config ->
                 Column(
                     horizontalAlignment = Alignment.End,
                     verticalArrangement = Arrangement.spacedBy(Dimensions.Spacer.xSmall)
                 ) {
                     ThresholdLabel(
-                        label = stringResource(R.string.max),
+                        label = stringResource(R.string.warn_above),
                         value = ValueFormatter.format(config.maxValue, measurementType),
                         color = temperatureWarm
                     )
                     ThresholdLabel(
-                        label = stringResource(R.string.min),
+                        label = stringResource(R.string.warn_below),
                         value = ValueFormatter.format(config.minValue, measurementType),
                         color = temperatureCold
                     )
@@ -404,7 +407,7 @@ fun ReadingsChart(
     }
 
     Column(modifier = modifier.fillMaxWidth()) {
-        // Y-axis title
+        // Y-axis title and Title
         Row (verticalAlignment = Alignment.Bottom) {
             Text(
                 text = ValueFormatter.unitLabel(measurementType),
