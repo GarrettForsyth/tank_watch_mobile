@@ -38,6 +38,7 @@ import com.garrettforsyth.tankwatch.ui.theme.temperatureWarm
 import com.garrettforsyth.tankwatch.ui.util.PreviewData
 import com.garrettforsyth.tankwatch.ui.util.ValueFormatter
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
+import com.patrykandpatrick.vico.compose.cartesian.Zoom
 import com.patrykandpatrick.vico.compose.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.compose.cartesian.data.CartesianLayerRangeProvider
 import com.patrykandpatrick.vico.compose.cartesian.data.lineSeries
@@ -177,7 +178,8 @@ private fun Sparkline(
                                     )
                                 )
                             )
-                        )
+                        ),
+                        interpolator = LineCartesianLayer.Interpolator.cubic(),
                     )
                 ),
                 rangeProvider = object : CartesianLayerRangeProvider {
@@ -198,7 +200,10 @@ private fun Sparkline(
             .fillMaxWidth()
             .height(Dimensions.sparkLineHeight),
         scrollState = rememberVicoScrollState(scrollEnabled = false),
-        zoomState = rememberVicoZoomState(zoomEnabled = false),
+        zoomState = rememberVicoZoomState(
+            zoomEnabled = false,
+            initialZoom = Zoom.Content
+        ),
     )
 }
 
