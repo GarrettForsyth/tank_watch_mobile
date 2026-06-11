@@ -413,7 +413,13 @@ fun ReadingsChart(
     val bottomAxisFormatter = CartesianValueFormatter { _, x, _ ->
         val instant = Instant.fromEpochSeconds(x.toLong())
         val local = instant.toLocalDateTime(TimeZone.currentSystemDefault())
-        "%02d:%02d".format(local.hour, local.minute)
+        when (readingRange) {
+            ReadingRange.ONE_HOUR,
+            ReadingRange.SIX_HOUR,
+            ReadingRange.ONE_DAY -> "%02d:%02d".format(local.hour, local.minute)
+            ReadingRange.ONE_WEEK,
+            ReadingRange.ONE_MONTH -> "${local.month.name.take(3).lowercase().replaceFirstChar { it.uppercase() }} ${local.day}"
+        }
     }
 
     Column(modifier = modifier.fillMaxWidth()) {
