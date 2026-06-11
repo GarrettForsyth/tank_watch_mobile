@@ -327,7 +327,7 @@ fun ReadingsChart(
         Box(
             modifier = modifier
                 .fillMaxWidth()
-                .height(200.dp),
+                .height(Dimensions.readingsChartHeight),
             contentAlignment = Alignment.Center
         ) {
             Text(
@@ -372,7 +372,7 @@ fun ReadingsChart(
     val onSurfaceVariant = MaterialTheme.colorScheme.onSurfaceVariant
     val labelTextStyle = TextStyle(
         color = onSurfaceVariant,
-        fontSize = 10.sp
+        fontSize = Dimensions.FontSize.chartLabel
     )
 
     val decorations = remember(config, onSurfaceVariant) {
