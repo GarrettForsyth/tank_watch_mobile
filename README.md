@@ -16,17 +16,17 @@ This repo contains the native Android app: Kotlin, Jetpack Compose, Hilt, Retrof
 
 ## Demo
 
-<!-- Replace with your video embed or GIF once recorded -->
-> 📹 Demo video coming soon
+![TankWatch Demo](docs/tankwatch_demo.gif)
 
 ---
 
 ## Screenshots
 
-<!-- Add screenshots after recording -->
-| Dashboard | Sensor Detail | Sensor Config |
-|---|---|---|
-| _coming soon_ | _coming soon_ | _coming soon_ |
+
+| Dashboard | Sensor Detail |
+
+<img src="docs/screen_dashboard.png" width="100"/> 
+<img src="docs/screen_sensor_details.png" width="100"/>
 
 ---
 
