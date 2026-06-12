@@ -25,8 +25,10 @@ This repo contains the native Android app: Kotlin, Jetpack Compose, Hilt, Retrof
 
 | Dashboard | Sensor Detail |
 
-<img src="docs/screen_dashboard.png" width="100"/> 
-<img src="docs/screen_sensor_details.png" width="100"/>
+<div>
+    <img src="docs/screen_dashboard.png" width="200"/> 
+    <img src="docs/screen_sensor_details.png" width="200"/>
+</div>
 
 ---
 
